@@ -27,6 +27,8 @@ PROVIDE (software_init_hook = 0);
 SECTIONS
 {
 	. = 0xffffffffa0000000;
+	PROVIDE(__entry = .);
+
 	.text : {
 		_ftext = . ;
 		PROVIDE (eprol  =  .);

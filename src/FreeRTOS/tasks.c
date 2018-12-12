@@ -846,8 +846,8 @@ static void prvAddNewTaskToReadyList( TCB_t *pxNewTCB ) PRIVILEGED_FUNCTION;
 		{
 			xReturn = errCOULD_NOT_ALLOCATE_REQUIRED_MEMORY;
 		}
-		OutString(pxNewTCB->pcTaskName);
-		putsnds("=0x", (reg_t)pxNewTCB, 8, "\n");
+		// OutString(pxNewTCB->pcTaskName);
+		// putsnds("=0x", (reg_t)pxNewTCB, 8, "\n");
 		return xReturn;
 	}
 
@@ -5083,5 +5083,3 @@ when performing module tests). */
 	}
 
 #endif
-
-

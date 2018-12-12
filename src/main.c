@@ -50,13 +50,18 @@ int main(void)
 	{
 		/* Start the two tasks as described in the accompanying application
 		note. */
-		xTaskCreate( prvQueueReceiveTask, ( signed char * ) "Rx", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_RECEIVE_TASK_PRIORITY, NULL );
-		xTaskCreate( prvQueueSendTask, ( signed char * ) "TX", configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
-		xTaskCreate( taskA, ( signed char * ) "taskA", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL );
-		xTaskCreate( taskB, ( signed char * ) "taskB", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1, NULL );
+		xTaskCreate( prvQueueReceiveTask, ( signed char * ) "Rx",
+			configMINIMAL_STACK_SIZE, NULL, mainQUEUE_RECEIVE_TASK_PRIORITY, NULL );
+		xTaskCreate( prvQueueSendTask, ( signed char * ) "TX",
+			configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
+		xTaskCreate( taskA, ( signed char * ) "taskA", configMINIMAL_STACK_SIZE,
+			NULL, tskIDLE_PRIORITY + 1, NULL );
+		xTaskCreate( taskB, ( signed char * ) "taskB", configMINIMAL_STACK_SIZE,
+			NULL, tskIDLE_PRIORITY + 1, NULL );
 
 		asm("nop\n"
-// 			"nop\n"
+				"nop\n"
+				"nop\n"
 		);
 
 		/* Start the tasks running. */

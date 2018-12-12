@@ -1,4 +1,4 @@
-APP = testBench
+APP = mipsFreeRTOS
 
 CC = mips-mti-elf-gcc
 OBJDUMP = mips-mti-elf-objdump
@@ -26,7 +26,7 @@ CSRC :=  \
 	croutine.c \
 	heap_2.c \
 	port.c
-	
+
 ASMSRC := debug.S int_handler.S
 
 OBJS := $(ASMSRC:.S=.o) $(CSRC:.c=.o)
@@ -35,7 +35,7 @@ OBJDIR = objs
 SRCDIR = src
 TOBJS := $(addprefix $(OBJDIR)/, $(OBJS))
 
-all: $(OBJDIR)/minicrt.o $(APP).bin 
+all: $(OBJDIR)/minicrt.o $(APP).bin
 
 $(APP).bin: $(APP).elf
 	@ $(OBJCOPY) -S --output-target binary $^ $@
@@ -74,4 +74,4 @@ firmware:
 
 .PHONY: clean
 clean:
-	@ rm -rf $(APP).bin $(APP).elf objs/* 
+	@ rm -rf $(APP).bin $(APP).elf objs/*

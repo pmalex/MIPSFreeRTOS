@@ -87,7 +87,7 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 // 	putsns("(0x", (reg_t)pxTopOfStack, ", ");
 // 	putsns("0x", (reg_t)pxCode, ", ");
 // 	putsnds("0x", (reg_t)pvParameters, 8, ") = ");
-	
+
 	*pxTopOfStack = (StackType_t) 0xEFACABCDDEADBEEF;
 	pxTopOfStack--;
 
@@ -106,9 +106,9 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 
 	/* Save GP register value in the context */
 	asm volatile ("sd $gp, %0" : "=m" (*( pxTopOfStack + CTX_GP/8 )));
-	
+
 // 	putsns("0x", (reg_t)(pxTopOfStack), "\n");
-	
+
 	return pxTopOfStack;
 }
 /*-----------------------------------------------------------*/
@@ -140,7 +140,7 @@ BaseType_t xPortStartScheduler( void )
 {
 extern void vPortStartFirstTask( void );
 extern void *pxCurrentTCB;
-	wwrite(__func__);wwrite("\n");
+	// wwrite(__func__);wwrite("\n");
 #if ( configCHECK_FOR_STACK_OVERFLOW > 2 )
 {
 	/* Fill the ISR stack to make it easy to asses how much is being used. */
@@ -149,19 +149,19 @@ extern void *pxCurrentTCB;
 #endif /* configCHECK_FOR_STACK_OVERFLOW > 2 */
 
 	mips32_bissr (SR_IE);
-	
+
 	/* Kick off the highest priority task that has been created so far.
 	Its stack location is loaded into uxSavedTaskStackPointer. */
 	uxSavedTaskStackPointer = *( UBaseType_t * ) pxCurrentTCB;
 
 	mips_setcount(0);
 	mips_eic0_setmask(0x8);
-	
+
 	mips_setcompare(0x5000);
 
-	putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
-	putsnds("sr=0x", mips_getsr(), 8, "\n");
-	
+	// putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
+	// putsnds("sr=0x", mips_getsr(), 8, "\n");
+
 	vPortStartFirstTask();
 
 	/* Should never get here as the tasks will now be executing!  Call the task
