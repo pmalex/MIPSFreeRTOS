@@ -148,19 +148,19 @@ extern void *pxCurrentTCB;
 }
 #endif /* configCHECK_FOR_STACK_OVERFLOW > 2 */
 
-	mips32_bissr (SR_IE);
-
 	/* Kick off the highest priority task that has been created so far.
 	Its stack location is loaded into uxSavedTaskStackPointer. */
 	uxSavedTaskStackPointer = *( UBaseType_t * ) pxCurrentTCB;
 
-	mips_setcount(0);
-	mips_eic0_setmask(0x8);
-
-	mips_setcompare(0x5000);
+	mips_eic0_setmask(0x9);
 
 	// putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
 	// putsnds("sr=0x", mips_getsr(), 8, "\n");
+    // putsnds("cr=0x", mips_getcr(), 8, "\n");
+
+    mips32_bissr (SR_IE);
+    mips_setcount(0);
+    mips_setcompare(0x1000);
 
 	vPortStartFirstTask();
 
@@ -194,24 +194,19 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
 #endif
 
 /*-----------------------------------------------------------*/
-void proc1 (void)
-{
-// 	putsns("pxStack=0x", pxCurrentTCB->pxStack, "\n");
-}
-/*-----------------------------------------------------------*/
 
-UBaseType_t uxPortSetInterruptMaskFromISR( void )
-{
-	UBaseType_t uxSavedEIC0MaskRegister;
-
-	uxSavedEIC0MaskRegister = mips_eic0_getmask ();
-	mips_eic0_setmask (0);
-
-	return uxSavedEIC0MaskRegister;
-}
-/*-----------------------------------------------------------*/
-
-void vPortClearInterruptMaskFromISR( UBaseType_t uxSavedEIC0MaskRegister )
-{
-	mips_eic0_setmask ( uxSavedEIC0MaskRegister );
-}
+// UBaseType_t uxPortSetInterruptMaskFromISR( void )
+// {
+// 	UBaseType_t uxSavedEIC0MaskRegister;
+//
+// 	uxSavedEIC0MaskRegister = mips_eic0_getmask ();
+// 	mips_eic0_setmask (0);
+//
+// 	return uxSavedEIC0MaskRegister;
+// }
+// /*-----------------------------------------------------------*/
+//
+// void vPortClearInterruptMaskFromISR( UBaseType_t uxSavedEIC0MaskRegister )
+// {
+// 	mips_eic0_setmask ( uxSavedEIC0MaskRegister );
+// }

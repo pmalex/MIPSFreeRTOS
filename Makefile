@@ -4,10 +4,9 @@ CC = mips-mti-elf-gcc
 OBJDUMP = mips-mti-elf-objdump
 OBJCOPY = mips-mti-elf-objcopy
 
-DIR = $(shell 'pwd')
-INCLUDE = -I$(DIR)/src -I$(DIR)/src/drivers -I$(DIR)/src/lib \
-	-I$(DIR)/src/FreeRTOS/include -I$(DIR)/src/FreeRTOS/portable \
-	-I$(DIR)/src/FreeRTOS/MemMang -I$(DIR)/src/FreeRTOS
+INCLUDE = -Isrc -Isrc/drivers -Isrc/lib \
+	-Isrc/FreeRTOS/include -Isrc/FreeRTOS/portable \
+	-Isrc/FreeRTOS/MemMang -Isrc/FreeRTOS
 
 CCFLAGS = -EL -mabi=64 $(INCLUDE) -msoft-float -O0 -g
 LDSCRIPT = script.ld

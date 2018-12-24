@@ -26,7 +26,7 @@
 #define configMAX_TASK_NAME_LEN                     ( 16 )
 
 /* Hook functions */
-#define configUSE_IDLE_HOOK                         1
+#define configUSE_IDLE_HOOK                         0
 #define configUSE_TICK_HOOK                         0
 
 /* Co routines */
@@ -56,9 +56,10 @@
 #define INCLUDE_vTaskDelete							1
 #define INCLUDE_vTaskSuspend						0
 
+// #define ENABLE_TRACE
+
 #if defined(ENABLE_TRACE)
 #include "trace.h"
 #endif
 
 #endif	/* FREERTOSCONFIG_H */
-

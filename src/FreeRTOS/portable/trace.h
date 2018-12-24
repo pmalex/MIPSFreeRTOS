@@ -14,8 +14,11 @@ enum _traceEvents {
 };
 #endif
 
-#define TRACE_EVENT(x)      _m32c0_mtc0(23, 3, (x))
-#define TRACE_VALUE(x)      _m32c0_mtc0(24, 3, (x))
+// #define TRACE_EVENT(x)      _m32c0_mtc0(23, 3, (x))
+// #define TRACE_VALUE(x)      _m32c0_mtc0(24, 3, (x))
+#define TRACE_EVENT(x) do { OutString("TRACE:"); SendByte('0' + x); } while(0)
+#define TRACE_VALUE(x) do{ SendByte(':'); OutReg32((reg_t)x);} while(0)
+
 #define TRACE_PAIR(x, y)    do { TRACE_EVENT((x)); TRACE_VALUE((y)); } while(0)
 
 #define traceTASK_INCREMENT_TICK(x) TRACE_PAIR(trace_TICK, (x))
@@ -27,4 +30,3 @@ enum _traceEvents {
 #endif
 
 #endif	/* TRACE_H */
-

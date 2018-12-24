@@ -7,16 +7,9 @@ extern "C"
 {
 #endif
 
-#define portDISABLE_INTERRUPTS( )			\
-{											\
-	mips_eic0_setmask(0);					\
-}
+#define portDISABLE_INTERRUPTS( ) asm("di")
 
-#define portENABLE_INTERRUPTS( )			\
-{											\
-	mips_eic0_setmask(8);					\
-}
-
+#define portENABLE_INTERRUPTS( ) asm("ei")
 
 extern void vTaskEnterCritical( void );
 extern void vTaskExitCritical( void );
@@ -53,15 +46,14 @@ extern void vTaskExitCritical( void );
 
 /* To yield, we fire off a software interrupt, that will be handled by the
 relevant interrupt handler. */
-extern volatile uint8_t flagYIELD;
-#define portYIELD()							\
-{											\
-	flagYIELD = 1;							\
-	mips_eic0_seticureq(8);					\
+// extern volatile uint8_t flagYIELD;
+#define portYIELD() \
+{ \
+	mips_eic0_seticureq(1); \
 }
 
-extern volatile UBaseType_t uxInterruptNesting;
-#define portASSERT_IF_IN_ISR()  configASSERT( uxInterruptNesting == 0 )
+// extern volatile UBaseType_t uxInterruptNesting;
+// #define portASSERT_IF_IN_ISR()  configASSERT( uxInterruptNesting == 0 )
 
 #define portNOP()               __asm volatile ( "nop" )
 /*-----------------------------------------------------------*/
@@ -71,4 +63,3 @@ extern volatile UBaseType_t uxInterruptNesting;
 #endif
 
 #endif	/* CRIT_SECT_H */
-

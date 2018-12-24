@@ -1,12 +1,16 @@
 #include <mips/cpu.h>
 #include <stdint.h>
 
+// #include "crit_task.h"
+
 #define UART_BASE			0xffffffffb8210400
 
 void SendByte (const uint8_t x)
 {
+    // portENTER_CRITICAL();
 	while(!(*((volatile uint8_t* const)UART_BASE + 0x08) & 0x08));
 	*((volatile uint8_t* const)UART_BASE + 0x20) = x;
+    // portEXIT_CRITICAL();
 }
 
 int write (int file, const char *ptr, int len)
@@ -49,7 +53,7 @@ void* memset(void* memptr, int val, size_t num)
 {
 	while(num--)
 		*((uint8_t*)memptr + num) = (uint8_t)val;
-	
+
 	return memptr;
 }
 
@@ -57,7 +61,6 @@ void* memcpy(void * destptr, const void* srcptr, size_t num)
 {
 	while(num--)
 		*((uint8_t*)destptr + num) = *((uint8_t*)srcptr + num);
-	
+
 	return destptr;
 }
-
