@@ -1,15 +1,15 @@
 #include <mips/cpu.h>
 #include <stdint.h>
 
-// #include "crit_task.h"
+#include "crit_task.h"
 
 #define UART_BASE			0xffffffffb8210400
 
 void SendByte (const uint8_t x)
 {
     // portENTER_CRITICAL();
-	while(!(*((volatile uint8_t* const)UART_BASE + 0x08) & 0x08));
-	*((volatile uint8_t* const)UART_BASE + 0x20) = x;
+	while(!(*((volatile uint8_t* const)(UART_BASE + 0x08)) & 0x08));
+	*((volatile uint8_t* const)(UART_BASE + 0x20)) = x;
     // portEXIT_CRITICAL();
 }
 

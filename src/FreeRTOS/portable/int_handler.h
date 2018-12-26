@@ -26,19 +26,19 @@ extern "C"
 /*
  * The software interrupt handler that performs the yield.
  */
-// extern void vPortYieldISR( void );
+extern void vPortYieldISR( void );
 
-// extern UBaseType_t uxPortSetInterruptMaskFromISR( void );
-// extern void vPortClearInterruptMaskFromISR( UBaseType_t );
+extern UBaseType_t uxPortSetInterruptMaskFromISR( void );
+extern void vPortClearInterruptMaskFromISR( UBaseType_t );
 
 #define SR_DSP  0
 
 #define portINITIAL_SR      ( SR_IE )
 #define portCLEAR_PENDING_INTERRUPTS()      mips_eic0_setmask (0)
 
-// #define portSET_INTERRUPT_MASK_FROM_ISR()   uxPortSetInterruptMaskFromISR()
-// #define portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedStatusRegister ) \
-// 	vPortClearInterruptMaskFromISR( uxSavedStatusRegister )
+#define portSET_INTERRUPT_MASK_FROM_ISR()   uxPortSetInterruptMaskFromISR()
+#define portCLEAR_INTERRUPT_MASK_FROM_ISR( uxSavedStatusRegister ) \
+	vPortClearInterruptMaskFromISR( uxSavedStatusRegister )
 
 
 #ifdef	__cplusplus

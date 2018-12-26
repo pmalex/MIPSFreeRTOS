@@ -48,7 +48,7 @@ LEAF(_mips_isr_001)
 
 	li		a0, '['
 	jal		SendByte
-    
+
 	portYIELD_SAVE_PSS
 
     li		a0, 'Y'
@@ -57,6 +57,9 @@ LEAF(_mips_isr_001)
 	jal		vTaskSwitchContext
 
 	portYIELD_RESTORE_PSS
+
+    // mfc0 a0, C0_EPC
+    // jal OutReg32
 
 	li		a0, ']'
 	jal		SendByte
@@ -70,16 +73,16 @@ LEAF(_mips_isr_004)
 	LA		sp, xISRStackTop
     LA		gp, _gp
 
-	li		a0, '{'
+	li		a0, '~'
 	jal		SendByte
 
-	jal		xTaskIncrementTick
+    jal		vPortIncrementTick
 
-	// dmfc0	a0, C0_STATUS
+	// dmfc0	a0, C0_EPC
 	// jal OutReg32
 
-	li		a0, '}'
-	jal		SendByte
+	// li		a0, '}'
+	// jal		SendByte
 
     // Обнуляем счётчик
 	mtc0	zero, C0_COUNT

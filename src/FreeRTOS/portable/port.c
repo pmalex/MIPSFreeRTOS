@@ -154,13 +154,13 @@ extern void *pxCurrentTCB;
 
 	mips_eic0_setmask(0x9);
 
-	// putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
-	// putsnds("sr=0x", mips_getsr(), 8, "\n");
-    // putsnds("cr=0x", mips_getcr(), 8, "\n");
+	putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
+	putsnds("sr=0x", mips_getsr(), 8, "\n");
+    putsnds("cr=0x", mips_getcr(), 8, "\n");
 
     mips32_bissr (SR_IE);
     mips_setcount(0);
-    mips_setcompare(0x1000);
+    mips_setcompare(0x3000);
 
 	vPortStartFirstTask();
 
@@ -178,7 +178,7 @@ void vPortIncrementTick( void )
 {
 	if( xTaskIncrementTick() != pdFALSE )
 	{
-		wwrite("ctx switch...\n");
+		// wwrite("ctx switch...\n");
 		/* Pend a context switch. */
 		portYIELD();
 	}
@@ -194,19 +194,23 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
 #endif
 
 /*-----------------------------------------------------------*/
+void minidebug( void )
+{
+    putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
+}
+/*-----------------------------------------------------------*/
+UBaseType_t uxPortSetInterruptMaskFromISR( void )
+{
+	UBaseType_t uxSavedEIC0MaskRegister;
 
-// UBaseType_t uxPortSetInterruptMaskFromISR( void )
-// {
-// 	UBaseType_t uxSavedEIC0MaskRegister;
-//
-// 	uxSavedEIC0MaskRegister = mips_eic0_getmask ();
-// 	mips_eic0_setmask (0);
-//
-// 	return uxSavedEIC0MaskRegister;
-// }
-// /*-----------------------------------------------------------*/
-//
-// void vPortClearInterruptMaskFromISR( UBaseType_t uxSavedEIC0MaskRegister )
-// {
-// 	mips_eic0_setmask ( uxSavedEIC0MaskRegister );
-// }
+	uxSavedEIC0MaskRegister = mips_eic0_getmask ();
+	mips_eic0_setmask (0);
+
+	return uxSavedEIC0MaskRegister;
+}
+/*-----------------------------------------------------------*/
+
+void vPortClearInterruptMaskFromISR( UBaseType_t uxSavedEIC0MaskRegister )
+{
+	mips_eic0_setmask ( uxSavedEIC0MaskRegister );
+}

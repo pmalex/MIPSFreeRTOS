@@ -3,12 +3,13 @@
 
 .set noat
 
-.org 0x000
-_mips_tlb_refill:
-		.weak _mips_tlb_refill_isr
-		LA		k0, _mips_tlb_refill_isr
-		beqz	k0, _mips_tlb_refill
-		jr		k0
+j _start
+// .org 0x000
+// _mips_tlb_refill:
+// 		.weak _mips_tlb_refill_isr
+// 		LA		k0, _mips_tlb_refill_isr
+// 		beqz	k0, _mips_tlb_refill
+// 		jr		k0
 
 .org 0x080
 _mips_xtlb_refill:
@@ -54,20 +55,37 @@ END(__isr_vec)
 .org 0xb00
 LEAF(_start)
 	/* Set up global pointer for small data access */
-	LA		gp, _gp
-	/* Set up stack pointer */
-	LA		sp, __stack
+	LA     gp, _gp
 
-	jal		hardware_init_hook
+    /*
+     * zero out the bss section.
+     */
+    LA     t0, _fbss
+	LA     t1, _end
+	beq    t0, t1, 1f
 2:
+	PTR_ADDU   t0, t0, 4
+	sw     zero, -4(t0)
+	bne    t0, t1, 2b
+1:
+
+	/* Set up stack pointer */
+	LA     sp, __stack
+
+	jal    hardware_init_hook
+
+    jal     _init
+
 	/* Jump to C code */
-	jal		main
+	jal    main
+
+    jal     _fini
 
 	/* Call the exit handler */
-	jal		__exit
+	jal    __exit
 
 	.weak __exit
 AENT(__exit)
-	li		ra, 0xbfc00000
-	jr		ra
+	li     ra, 0xbfc00000
+	jr     ra
 END(_start)

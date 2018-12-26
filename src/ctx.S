@@ -7,10 +7,15 @@
    shadow set. */
 .macro _gpctx_save_pss
 	.irp num,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 \
-			20,21,22,23,24,25,26,27,28,29,30,31
+			20,21,22,23,24,25,27,28,29,30,31
         rdpgpr  k1, $\num
 		REG_S   k1, CTX_REG(\num) (k0)
 	.endr
+
+    rdpgpr  k1, k0
+    nop
+    nop
+    REG_S   k1, CTX_REG(26) (k0)
 
 	mfhi	k1
 	REG_S	k1,  CTX_HI0(k0)
