@@ -2,13 +2,14 @@ ENTRY(_start)
 OUTPUT_FORMAT("elf64-tradlittlemips")
 SEARCH_DIR(objs)
 __DYNAMIC  =  0;
+GROUP(-lc)
 STARTUP(minicrt.o)
 
 /*
  * Allocate the stack to be at the top of memory, since the stack
  * grows down
  */
-PROVIDE (__stack = 0xffffffffa0100000);
+
 /* PROVIDE (__global = 0); */
 
 /*
@@ -27,7 +28,12 @@ PROVIDE (software_init_hook = 0);
 SECTIONS
 {
 	. = 0xffffffffa0000000;
-	PROVIDE(__entry = .);
+    /* . = 0xffffffffbfc00000; */
+
+    /* Выделяем 1 мегабайт памяти */
+    PROVIDE (__stack = . + 0x100000);
+
+    PROVIDE(__entry = .);
 
 	.text : {
 		_ftext = . ;
@@ -152,6 +158,15 @@ SECTIONS
 		*(.bss.*)
 		*(.gnu.linkonce.b.*)
 		*(COMMON)
+	}
+
+    /DISCARD/ :
+	{
+		*.o (.MIPS.options)
+		*.o (.MIPS.abiflags)
+		*.o (.gnu.attributes)
+        /* *.o (.debug*) */
+        /* *.o (.comment) */
 	}
 
 	. = ALIGN(4);

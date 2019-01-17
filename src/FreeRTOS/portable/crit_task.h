@@ -7,9 +7,9 @@ extern "C"
 {
 #endif
 
-#define portDISABLE_INTERRUPTS( ) asm("di")
+#define portDISABLE_INTERRUPTS( ) asm("di;ehb")
 
-#define portENABLE_INTERRUPTS( ) asm("ei")
+#define portENABLE_INTERRUPTS( ) asm("ei;ehb")
 
 extern void vTaskEnterCritical( void );
 extern void vTaskExitCritical( void );
@@ -46,7 +46,6 @@ extern void vTaskExitCritical( void );
 
 /* To yield, we fire off a software interrupt, that will be handled by the
 relevant interrupt handler. */
-// extern volatile uint8_t flagYIELD;
 #define portYIELD() \
 { \
 	mips_eic0_seticureq(1); \

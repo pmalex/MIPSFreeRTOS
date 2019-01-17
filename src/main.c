@@ -3,8 +3,6 @@
 #include "task.h"
 #include "queue.h"
 
-#include "iolib.h"
-
 /* Priorities at which the tasks are created. */
 #define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
 #define	mainQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 1 )
@@ -42,7 +40,9 @@ unsigned long ulTaskNumber[ 3 ];
 /*-----------------------------------------------------------*/
 int main(void)
 {
-	wwrite("Welcome to MIPS FreeRTOS 0.0.0\n");
+    OutString("######################################################\n");
+	OutString("Welcome to MIPS FreeRTOS 0.0.0\n");
+
 	/* Create the queue. */
 	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( unsigned long ) );
 
@@ -56,9 +56,9 @@ int main(void)
 			configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
 
 		// xTaskCreate( taskA, ( signed char * ) "taskA", configMINIMAL_STACK_SIZE,
-		// 	NULL, tskIDLE_PRIORITY + 1, NULL );
+			// NULL, tskIDLE_PRIORITY + 1, NULL );
 		// xTaskCreate( taskB, ( signed char * ) "taskB", configMINIMAL_STACK_SIZE,
-		// 	NULL, tskIDLE_PRIORITY + 1, NULL );
+			// NULL, tskIDLE_PRIORITY + 1, NULL );
 
 		// asm("nop\n"
 			// "nop\n"
@@ -88,7 +88,6 @@ static void taskA( void *pvParameters )
 {
 	// for( ;; ){
 		// for(int i = 0;i < 10000;i++);
-		wwrite("taskA\n");
         vTaskDelete(NULL);
 	// }
 }
@@ -97,7 +96,7 @@ static void taskB( void *pvParameters )
 {
 	// for( ;; ){
 // 		for(int i = 0;i < 10000;i++);
-		wwrite("taskB\n");
+		// OutString("XYZW\n");
         vTaskDelete(NULL);
 	// }
 }
@@ -108,7 +107,7 @@ static void prvQueueSendTask( void *pvParameters )
 portTickType xNextWakeTime;
 const unsigned long ulValueToSend = 100UL;
 
-	putsnds(__func__, 0, 0, " call...\n");
+    OutString(__func__); OutString(" call...\n");
 
 	/* Initialise xNextWakeTime - this only needs to be done once. */
 	xNextWakeTime = xTaskGetTickCount();
@@ -127,7 +126,7 @@ const unsigned long ulValueToSend = 100UL;
 		should always be empty at this point in the code. */
 		xQueueSend( xQueue, &ulValueToSend, 0 );
 
-		putsnds(__func__, 0, 0, " message sent\n");
+        OutString(__func__); OutString(" message sent\n");
 		vTaskDelete(NULL);
 	}
 }
@@ -138,7 +137,7 @@ static unsigned long ulRcv;
 static void prvQueueReceiveTask( void *pvParameters )
 {
 unsigned long ulReceivedValue;
-	putsnds(__func__, 0, 0, " call\n");
+    OutString(__func__); OutString(" call\n");
 
 	for( ;; )
 	{
@@ -147,7 +146,7 @@ unsigned long ulReceivedValue;
 		FreeRTOSConfig.h. */
 		xQueueReceive( xQueue, &ulReceivedValue, portMAX_DELAY );
 
-		putsnds(__func__, 0, 0, " message received\n");
+        OutString(__func__); OutString(" message received\n");
 
 		/*  To get here something must have been received from the queue, but
 		is it the expected value?  If it is, print out a pass message, if no,
@@ -170,6 +169,6 @@ void vAssertCalled( const char *pcFileName, unsigned long ulLine )
 {
 	OutString("Guru meditation in ");
 	OutString(pcFileName);
-	putsnds(": 0x", ulLine, 4, "\n");
+    OutString(": 0x"); OutReg32((reg_t)ulLine); SendByte('\n');
 	for (;;);
 }

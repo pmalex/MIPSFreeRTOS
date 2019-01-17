@@ -12,7 +12,7 @@
 string\@: .asciiz "\str"
 	.text
 	dla		a0, string\@
-	jal		wwrite
+	jal		OutString
 .endm
 
 /* General exception vector */
@@ -43,26 +43,31 @@ END(_mips_general_exception_isr)
 
 /* SW0 interrupt handler */
 LEAF(_mips_isr_001)
-	LA		sp, xISRStackTop
+    // Cause_DC = 0
+    mfc0    a0, C0_CAUSE
+    li      a1, ~(1 << 27)
+    and     a0, a0, a1
+    mtc0    a0, C0_CAUSE
+    ehb
+
+	ld		sp, xISRStackTop
     LA		gp, _gp
 
-	li		a0, '['
-	jal		SendByte
-
 	portYIELD_SAVE_PSS
-
-    li		a0, 'Y'
-	jal		SendByte
 
 	jal		vTaskSwitchContext
 
 	portYIELD_RESTORE_PSS
 
-    // mfc0 a0, C0_EPC
-    // jal OutReg32
+    // Count = 0
+    mtc0	zero, C0_COUNT
 
-	li		a0, ']'
-	jal		SendByte
+    // Cause_DC = 1
+    mfc0    a0, C0_CAUSE
+    li      a1, (1 << 27)
+    or      a0, a0, a1
+    mtc0    a0, C0_CAUSE
+    ehb
 
 	eret
 END(_mips_isr_001)
@@ -70,22 +75,26 @@ END(_mips_isr_001)
 .align 8
 /* Timer interrupt handler */
 LEAF(_mips_isr_004)
-	LA		sp, xISRStackTop
-    LA		gp, _gp
+    // Cause_DC = 0
+    mfc0    a0, C0_CAUSE
+    li      a1, ~(1 << 27)
+    and     a0, a0, a1
+    mtc0    a0, C0_CAUSE
+    ehb
 
-	li		a0, '~'
-	jal		SendByte
+	ld		sp, xISRStackTop
+    LA		gp, _gp
 
     jal		vPortIncrementTick
 
-	// dmfc0	a0, C0_EPC
-	// jal OutReg32
-
-	// li		a0, '}'
-	// jal		SendByte
-
-    // Обнуляем счётчик
+    // Count = 0
 	mtc0	zero, C0_COUNT
+
+    // Cause_DC = 1
+    mfc0    a0, C0_CAUSE
+    li      a1, (1 << 27)
+    or      a0, a0, a1
+    mtc0    a0, C0_CAUSE
     ehb
 
 	eret

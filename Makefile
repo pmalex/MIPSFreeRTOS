@@ -8,7 +8,7 @@ INCLUDE = -Isrc -Isrc/drivers -Isrc/lib \
 	-Isrc/FreeRTOS/include -Isrc/FreeRTOS/portable \
 	-Isrc/FreeRTOS/MemMang -Isrc/FreeRTOS
 
-CCFLAGS = -EL -mabi=64 $(INCLUDE) -msoft-float -O0 -g
+CCFLAGS = -EL -mabi=64 $(INCLUDE) -mclib=tiny -msoft-float -O0 -g
 LDSCRIPT = script.ld
 LDFLAGS = -T$(LDSCRIPT) -msoft-float -EL -mabi=64
 
@@ -23,7 +23,7 @@ CSRC :=  \
 	timers.c \
 	event_groups.c \
 	croutine.c \
-	heap_2.c \
+	heap_4.c \
 	port.c
 
 ASMSRC := debug.S int_handler.S
@@ -73,7 +73,7 @@ bindump: $(APP).bin
 
 .PHONY: listing
 listing: $(APP).elf
-	@ $(OBJDUMP) -EL -Mgpr-names=numeric,cp0-names=numeric,no-aliases -mmips:isa64r2 -S $(APP).elf | less
+	@ $(OBJDUMP) -EL -Mgpr-names=numeric,cp0-names=numeric,no-aliases -mmips:isa64r2 -SD $(APP).elf | less
 
 .PHONY: firmware
 firmware:

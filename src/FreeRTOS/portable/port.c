@@ -15,7 +15,6 @@
 /* Interrupt handler */
 #include "int_handler.h"
 
-#include "iolib.h"
 #include "eic.h"
 
 /* Let the user override the pre-loading of the initial RA with the address of
@@ -83,11 +82,6 @@ const StackType_t * const xISRStackTop = &( xISRStack[ configISR_STACK_SIZE - 7 
  */
 StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
 {
-// 	OutString(__func__);
-// 	putsns("(0x", (reg_t)pxTopOfStack, ", ");
-// 	putsns("0x", (reg_t)pxCode, ", ");
-// 	putsnds("0x", (reg_t)pvParameters, 8, ") = ");
-
 	*pxTopOfStack = (StackType_t) 0xEFACABCDDEADBEEF;
 	pxTopOfStack--;
 
@@ -106,8 +100,6 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 
 	/* Save GP register value in the context */
 	asm volatile ("sd $gp, %0" : "=m" (*( pxTopOfStack + CTX_GP/8 )));
-
-// 	putsns("0x", (reg_t)(pxTopOfStack), "\n");
 
 	return pxTopOfStack;
 }
@@ -154,13 +146,16 @@ extern void *pxCurrentTCB;
 
 	mips_eic0_setmask(0x9);
 
-	putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
-	putsnds("sr=0x", mips_getsr(), 8, "\n");
-    putsnds("cr=0x", mips_getcr(), 8, "\n");
+	// putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
+	// putsnds("sr=0x", mips_getsr(), 8, "\n");
+    // putsnds("cr=0x", mips_getcr(), 8, "\n");
 
     mips32_bissr (SR_IE);
     mips_setcount(0);
     mips_setcompare(0x3000);
+
+    /* Start Counting */
+	mips_biscr(CR_DC);
 
 	vPortStartFirstTask();
 
@@ -178,7 +173,6 @@ void vPortIncrementTick( void )
 {
 	if( xTaskIncrementTick() != pdFALSE )
 	{
-		// wwrite("ctx switch...\n");
 		/* Pend a context switch. */
 		portYIELD();
 	}
@@ -193,11 +187,6 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
 }
 #endif
 
-/*-----------------------------------------------------------*/
-void minidebug( void )
-{
-    putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
-}
 /*-----------------------------------------------------------*/
 UBaseType_t uxPortSetInterruptMaskFromISR( void )
 {

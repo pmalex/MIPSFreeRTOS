@@ -12,13 +12,10 @@ void hardware_init_hook(void)
 	mips_biscr( CR_IV );
 	mips32_setintctl( ( mips32_getintctl() & ~INTCTL_VS ) | INTCTL_VS_64 );
 
-	/* Start Counting */
-	mips_biscr(CR_DC);
-
 	/* Enable Interrupts */
 	mips_setsr(1);
 
-	// Разрешение работы EIC
+	/* Разрешение работы EIC */
 	mips_eic0_setctrl(1);
 
 	/* Настроим соответствие прерываний и теневых множеств. Нумерация
@@ -30,7 +27,4 @@ void hardware_init_hook(void)
 
 	/* Устанавливаем теневой набор для исключений */
 	mips32_setsrsctl (6 << SRSCTL_ESS_SHIFT);
-
-	/* Задержка, связанная с багом в наших скриптах загрузки */
-	for(int i = 0; i < 300000;i++);
 }

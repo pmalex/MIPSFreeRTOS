@@ -78,7 +78,7 @@ static uint8_t *pucAlignedHeap = NULL;
 		traceMALLOC( pvReturn, xWantedSize );
 	}
 	( void ) xTaskResumeAll();
-	
+
 
 	#if( configUSE_MALLOC_FAILED_HOOK == 1 )
 	{
@@ -90,15 +90,13 @@ static uint8_t *pucAlignedHeap = NULL;
 	}
 	#endif
 // 	wwrite("ok\n");
-	
+
 	return pvReturn;
 }
 /*-----------------------------------------------------------*/
 
 void vPortFree( void *pv )
 {
-	wwrite(__func__);
-	wwrite("\n");
 	/* Memory cannot be freed using this scheme.  See heap_2.c, heap_3.c and
 	heap_4.c for alternative implementations, and the memory management pages of
 	http://www.FreeRTOS.org for more information. */
@@ -111,8 +109,6 @@ void vPortFree( void *pv )
 
 void vPortInitialiseBlocks( void )
 {
-	wwrite(__func__);
-	wwrite("\n");
 	/* Only required when static memory is not cleared. */
 	xNextFreeByte = ( size_t ) 0;
 }
@@ -120,10 +116,5 @@ void vPortInitialiseBlocks( void )
 
 size_t xPortGetFreeHeapSize( void )
 {
-	wwrite(__func__);
-	wwrite("\n");
 	return ( configADJUSTED_HEAP_SIZE - xNextFreeByte );
 }
-
-
-

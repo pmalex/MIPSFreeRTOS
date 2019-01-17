@@ -12,7 +12,7 @@
 		REG_S   k1, CTX_REG(\num) (k0)
 	.endr
 
-    rdpgpr  k1, k0
+    rdpgpr  k1, $26
     nop
     nop
     REG_S   k1, CTX_REG(26) (k0)

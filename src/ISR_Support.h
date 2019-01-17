@@ -88,8 +88,8 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 
 	/* Save the stack pointer to the task. */
 	LA         s0, pxCurrentTCB
-	REG_L	   s0, (s0)
-	REG_S      k0, (s0)
+	REG_L	   s1, (s0)
+	REG_S      k0, (s1)
 .endm
 
 /******************************************************************/
@@ -98,16 +98,16 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 .macro portYIELD_RESTORE_PSS
 	/* Set the context restore register from the TCB. */
 	LA			s0, pxCurrentTCB
-	REG_L		s0, (s0)
-    REG_L		k0, (s0)
+	REG_L		s1, (s0)
+    REG_L		k0, (s1)
 
     /* Restore GRR context from previuous shadow set */
 	_gpctx_load_pss
 
 	/* Restore the stack pointer from the TCB. */
 	LA			s0, pxCurrentTCB
-	REG_L		s0, (s0)
-	REG_L		sp, (s0)
+	REG_L		s1, (s0)
+	REG_L		sp, (s1)
 
 	/* Remove stack frame. */
 	daddiu		sp, sp, CTX_SIZE

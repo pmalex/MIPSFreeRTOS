@@ -20,9 +20,9 @@
 #define configTICK_RATE_HZ                          1000
 #define configUSE_16_BIT_TICKS                      0
 #define configMAX_PRIORITIES                        5
-#define configMINIMAL_STACK_SIZE                    ( 2000 )
-#define configISR_STACK_SIZE                        ( 1000 )
-#define configTOTAL_HEAP_SIZE						( ( size_t ) (32*4096) )
+#define configMINIMAL_STACK_SIZE                    ( 1000 )
+#define configISR_STACK_SIZE                        ( 500 )
+#define configTOTAL_HEAP_SIZE						( ( size_t ) (32*2048) )
 #define configMAX_TASK_NAME_LEN                     ( 16 )
 
 /* Hook functions */
@@ -54,9 +54,9 @@
 #define INCLUDE_vTaskDelayUntil						1
 #define INCLUDE_vTaskDelay							1
 #define INCLUDE_vTaskDelete							1
-#define INCLUDE_vTaskSuspend						0
+#define INCLUDE_vTaskSuspend						1
 
-// #define ENABLE_TRACE
+#define ENABLE_TRACE
 
 #if defined(ENABLE_TRACE)
 #include "trace.h"
