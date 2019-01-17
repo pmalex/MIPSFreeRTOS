@@ -3,6 +3,54 @@
 #include <mips/cpu.h>
 #include <mips/hal.h>
 
+/* Save the hard context to a gp_ctx pointed to by k0 from previuous
+   shadow set. */
+.macro _gpctx_save_pss
+	.irp num,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19 \
+			20,21,22,23,24,25,27,28,29,30,31
+        rdpgpr  k1, $\num
+		REG_S   k1, CTX_REG(\num) (k0)
+	.endr
+
+    rdpgpr  k1, $26
+    nop
+    nop
+    REG_S   k1, CTX_REG(26) (k0)
+
+	mfhi	k1
+	REG_S	k1,  CTX_HI0(k0)
+	mflo	k1
+	REG_S	k1,  CTX_LO0(k0)
+
+	/* Save CP0 registers.  */
+	PTR_MFC0   k1, C0_EPC
+	REG_S      k1, CTX_EPC(k0)
+.endm
+
+/* Restores a gp_ctx pointed to by k0 from previuous shadow set.
+   C0_EPC ready to eret.  */
+.macro _gpctx_load_pss
+	REG_L      k1, CTX_HI0(k0)
+	mthi       k1
+    REG_L      k1, CTX_LO0(k0)
+	mtlo       k1
+
+	/* Restore the general registers.  */
+	.irp num,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19, \
+			20,21,22,23,24,25,27,28,29,30,31
+		REG_L     k1, CTX_REG(\num) (k0)
+        wrpgpr    $\num, k1
+	.endr
+
+    REG_L      k1, CTX_REG(26) (k0)
+    /* Эта команда здесь почему-то приводит к зависанию, т.е.
+       на данный момент мы не восстанавливаем регистр k1 */
+    // wrpgpr     $26, k1
+
+	REG_L      k1, CTX_EPC(k0)
+	PTR_MTC0   k1, C0_EPC
+.endm
+
 /* Save the hard context to a gp_ctx pointed to by k1.
    Leave the value of C0_STATUS in v0/$2.
    Leave the value of k1 unchanged.  */

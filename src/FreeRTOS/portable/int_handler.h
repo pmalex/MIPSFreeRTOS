@@ -46,4 +46,3 @@ extern void vPortClearInterruptMaskFromISR( UBaseType_t );
 #endif
 
 #endif	/* INT_HANDLER_H */
-

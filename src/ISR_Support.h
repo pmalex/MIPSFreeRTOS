@@ -16,7 +16,7 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 	/* Make room for the context. First save the current status so it can be
 	manipulated, and the cause and EPC registers so their original values are
 	captured. */
-	ADDU        sp, sp, -CTX_SIZE
+   ADDU        sp, sp, -CTX_SIZE
 	REG_S       k1, CTX_K1(sp)
 
 	/* k1 is used as the frame pointer. */
@@ -30,7 +30,7 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 	REG_S       k1, (s6)
 	REG_L       k1, CTX_K1(sp)
 
-	.endm
+.endm
 
 /******************************************************************/
 
@@ -39,7 +39,7 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 
 	LA          s6, uxSavedTaskStackPointer
 	REG_L       k0, (s6)
-	
+
 	/* Restore the context. */
 	_gpctx_load
 
@@ -47,12 +47,12 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 	REG_L       sp, (sp)
 
 	ADDU        sp, sp, CTX_SIZE
-	.endm
-	
+.endm
+
 /******************************************************************/
 
-	/* Yield context save */
-	.macro portYIELD_SAVE
+/* Yield context save from GPR */
+.macro portYIELD_SAVE
 
 	/* Make room for the context. First save the current status so it can be
 	manipulated. */
@@ -61,7 +61,7 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 
 	/* k0cd is used as the frame pointer. */
 	move        k1, sp
-	
+
 	/* Save the context into the space just created. */
 	_gpctx_save
 
@@ -70,17 +70,60 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 	REG_L		s7, (s7)
 	REG_S		k1, (s7)
 
-	.endm
+.endm
 
 /******************************************************************/
 
-	.macro portYIELD_RESTORE
+/* Yield context save from previuous shadow set */
+.macro portYIELD_SAVE_PSS
+    /* Read sp from GRP in k0 */
+    rdpgpr     k0, sp
+
+	/* Make room for the context. */
+    daddiu     k0, k0, -CTX_SIZE
+
+	/* Next k0 is will be used as the frame pointer.
+	   Save the context into the space just created. */
+	_gpctx_save_pss
+
+	/* Save the stack pointer to the task. */
+	LA         s0, pxCurrentTCB
+	REG_L	   s1, (s0)
+	REG_S      k0, (s1)
+.endm
+
+/******************************************************************/
+
+/* Yield context restore from previuous shadow set */
+.macro portYIELD_RESTORE_PSS
+	/* Set the context restore register from the TCB. */
+	LA			s0, pxCurrentTCB
+	REG_L		s1, (s0)
+    REG_L		k0, (s1)
+
+    /* Restore GRR context from previuous shadow set */
+	_gpctx_load_pss
+
+	/* Restore the stack pointer from the TCB. */
+	LA			s0, pxCurrentTCB
+	REG_L		s1, (s0)
+	REG_L		sp, (s1)
+
+	/* Remove stack frame. */
+	daddiu		sp, sp, CTX_SIZE
+    wrpgpr      sp
+
+.endm
+
+/******************************************************************/
+
+.macro portYIELD_RESTORE
 
 	/* Set the context restore register from the TCB. */
 	LA			s0, pxCurrentTCB
 	REG_L		s0, (s0)
 	REG_L		k0, (s0)
-	
+
 	/*
 	 * The _gpctx_load restore code just wholesale copies the
 	 * status register from the context back to the register loosing
@@ -103,7 +146,7 @@ As we are using Count/Compare as our timer, this fires on Status(HW5). */
 	/* Remove stack frame. */
 	daddiu		sp, sp, CTX_SIZE
 
-	.endm
+.endm
 
 #endif /* #if defined(__ASSEMBLER__) */
 

@@ -15,7 +15,6 @@
 /* Interrupt handler */
 #include "int_handler.h"
 
-#include "iolib.h"
 #include "eic.h"
 
 /* Let the user override the pre-loading of the initial RA with the address of
@@ -83,11 +82,6 @@ const StackType_t * const xISRStackTop = &( xISRStack[ configISR_STACK_SIZE - 7 
  */
 StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters )
 {
-// 	OutString(__func__);
-// 	putsns("(0x", (reg_t)pxTopOfStack, ", ");
-// 	putsns("0x", (reg_t)pxCode, ", ");
-// 	putsnds("0x", (reg_t)pvParameters, 8, ") = ");
-	
 	*pxTopOfStack = (StackType_t) 0xEFACABCDDEADBEEF;
 	pxTopOfStack--;
 
@@ -106,9 +100,7 @@ StackType_t *pxPortInitialiseStack( StackType_t *pxTopOfStack, TaskFunction_t px
 
 	/* Save GP register value in the context */
 	asm volatile ("sd $gp, %0" : "=m" (*( pxTopOfStack + CTX_GP/8 )));
-	
-// 	putsns("0x", (reg_t)(pxTopOfStack), "\n");
-	
+
 	return pxTopOfStack;
 }
 /*-----------------------------------------------------------*/
@@ -140,7 +132,7 @@ BaseType_t xPortStartScheduler( void )
 {
 extern void vPortStartFirstTask( void );
 extern void *pxCurrentTCB;
-	wwrite(__func__);wwrite("\n");
+	// wwrite(__func__);wwrite("\n");
 #if ( configCHECK_FOR_STACK_OVERFLOW > 2 )
 {
 	/* Fill the ISR stack to make it easy to asses how much is being used. */
@@ -148,20 +140,23 @@ extern void *pxCurrentTCB;
 }
 #endif /* configCHECK_FOR_STACK_OVERFLOW > 2 */
 
-	mips32_bissr (SR_IE);
-	
 	/* Kick off the highest priority task that has been created so far.
 	Its stack location is loaded into uxSavedTaskStackPointer. */
 	uxSavedTaskStackPointer = *( UBaseType_t * ) pxCurrentTCB;
 
-	mips_setcount(0);
-	mips_eic0_setmask(0x8);
-	
-	mips_setcompare(0x5000);
+	mips_eic0_setmask(0x9);
 
-	putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
-	putsnds("sr=0x", mips_getsr(), 8, "\n");
-	
+	// putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
+	// putsnds("sr=0x", mips_getsr(), 8, "\n");
+    // putsnds("cr=0x", mips_getcr(), 8, "\n");
+
+    mips32_bissr (SR_IE);
+    mips_setcount(0);
+    mips_setcompare(0x3000);
+
+    /* Start Counting */
+	mips_biscr(CR_DC);
+
 	vPortStartFirstTask();
 
 	/* Should never get here as the tasks will now be executing!  Call the task
@@ -178,7 +173,6 @@ void vPortIncrementTick( void )
 {
 	if( xTaskIncrementTick() != pdFALSE )
 	{
-		wwrite("ctx switch...\n");
 		/* Pend a context switch. */
 		portYIELD();
 	}
@@ -194,12 +188,6 @@ void vApplicationStackOverflowHook( TaskHandle_t xTask, char *pcTaskName )
 #endif
 
 /*-----------------------------------------------------------*/
-void proc1 (void)
-{
-// 	putsns("pxStack=0x", pxCurrentTCB->pxStack, "\n");
-}
-/*-----------------------------------------------------------*/
-
 UBaseType_t uxPortSetInterruptMaskFromISR( void )
 {
 	UBaseType_t uxSavedEIC0MaskRegister;

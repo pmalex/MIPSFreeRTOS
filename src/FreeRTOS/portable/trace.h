@@ -6,25 +6,36 @@ extern "C"
 {
 #endif
 
-#if !defined(__ASSEMBLER__)
-enum _traceEvents {
-	trace_TICK = 0,
-	trace_SWITCH_OUT,
-	trace_SWITCH_IN,
-};
-#endif
+#define TRACE_OUT_STRING(x) OutString(x)
+#define TRACE_OUT_VALUE(x) OutReg32((reg_t)x)
+#define TRACE_PROMPT() TRACE_OUT_STRING("\ntrace: ")
+#define TRACE_PAIR(x,y) do{ TRACE_PROMPT(); TRACE_OUT_STRING(x); \
+    SendByte(' '); TRACE_OUT_STRING(y);} while(0)
 
-#define TRACE_EVENT(x)      _m32c0_mtc0(23, 3, (x))
-#define TRACE_VALUE(x)      _m32c0_mtc0(24, 3, (x))
-#define TRACE_PAIR(x, y)    do { TRACE_EVENT((x)); TRACE_VALUE((y)); } while(0)
+#define traceTASK_INCREMENT_TICK(xTickCount)  SendByte('~');
+#define traceTASK_SWITCHED_OUT()              TRACE_PAIR("SWITCH_OUT", pxCurrentTCB -> pcTaskName)
+#define traceTASK_SWITCHED_IN()               TRACE_PAIR("SWITCH_IN", pxCurrentTCB -> pcTaskName)
+#define traceTASK_CREATE(pxNewTCB)            TRACE_PAIR("TASK_CREATE", pxNewTCB -> pcTaskName)
+#define traceTASK_DELETE(pxTaskToDelete)      TRACE_PAIR("TASK_DELETE", pxTaskToDelete -> pcTaskName)
+#define traceTASK_RESUME(pxTaskToResume)      TRACE_PAIR("TASK_RESUME", pxTaskToResume -> pcTaskName)
+#define traceTASK_SUSPEND(pxTaskToSuspend)    TRACE_PAIR("TASK_SUSPEND", pxTaskToSuspend -> pcTaskName)
+#define traceTASK_DELAY()                     TRACE_PAIR("TASK_DELAY", "")
 
-#define traceTASK_INCREMENT_TICK(x) TRACE_PAIR(trace_TICK, (x))
-#define traceTASK_SWITCHED_OUT()    TRACE_PAIR(trace_SWITCH_OUT, pxCurrentTCB)
-#define traceTASK_SWITCHED_IN()     TRACE_PAIR(trace_SWITCH_IN, pxCurrentTCB)
+#define traceMALLOC(pvAddress, uiSize) do { \
+            TRACE_PROMPT(); \
+            TRACE_OUT_STRING("MALLOC("); TRACE_OUT_VALUE(pvAddress); \
+            SendByte(','); \
+            TRACE_OUT_VALUE(uiSize); TRACE_OUT_STRING(")"); \
+        } while(0)
+
+#define traceFREE(pvAddress, uiSize) do { \
+            TRACE_PROMPT(); \
+            TRACE_OUT_STRING("FREE("); TRACE_OUT_VALUE(pvAddress); \
+            SendByte(','); TRACE_OUT_VALUE(uiSize); SendByte(')'); \
+        } while(0)
 
 #ifdef	__cplusplus
 }
 #endif
 
 #endif	/* TRACE_H */
-
