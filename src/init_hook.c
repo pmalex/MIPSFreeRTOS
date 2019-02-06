@@ -27,4 +27,7 @@ void hardware_init_hook(void)
 
 	/* Устанавливаем теневой набор для исключений */
 	mips32_setsrsctl (6 << SRSCTL_ESS_SHIFT);
+
+    /* Set random seed */
+    mips32_setindex(6);
 }

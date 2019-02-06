@@ -3,13 +3,13 @@
 
 .set noat
 
-j _start
-// .org 0x000
-// _mips_tlb_refill:
-// 		.weak _mips_tlb_refill_isr
-// 		LA		k0, _mips_tlb_refill_isr
-// 		beqz	k0, _mips_tlb_refill
-// 		jr		k0
+// j _start
+.org 0x000
+_mips_tlb_refill:
+		.weak _mips_tlb_refill_isr
+		LA		k0, _mips_tlb_refill_isr
+		beqz	k0, _mips_tlb_refill
+		jr		k0
 
 .org 0x080
 _mips_xtlb_refill:
@@ -41,6 +41,7 @@ LEAF(__isr_vec)
 		AENT(__isr_vec_0\num)
 		.weak   _mips_isr_0\num
 			LA		k0, _mips_isr_0\num
+            li      k1, 0x\num
 			beqz	k0, __isr_vec_fallback
 			jr		k0
 	.endr
@@ -74,12 +75,12 @@ LEAF(_start)
 
 	jal    hardware_init_hook
 
-    jal     _init
+    // jal     _init
 
 	/* Jump to C code */
 	jal    main
 
-    jal     _fini
+    // jal     _fini
 
 	/* Call the exit handler */
 	jal    __exit

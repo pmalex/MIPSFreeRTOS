@@ -20,10 +20,14 @@
 #define configTICK_RATE_HZ                          1000
 #define configUSE_16_BIT_TICKS                      0
 #define configMAX_PRIORITIES                        5
-#define configMINIMAL_STACK_SIZE                    ( 1000 )
-#define configISR_STACK_SIZE                        ( 500 )
-#define configTOTAL_HEAP_SIZE						( ( size_t ) (32*2048) )
+#define configMINIMAL_STACK_SIZE                    ( 2000 )
+#define configISR_STACK_SIZE                        ( 600 )
+#define configTOTAL_HEAP_SIZE						( ( size_t ) (64*4096) )
 #define configMAX_TASK_NAME_LEN                     ( 16 )
+
+#define configTASK_RETURN_ADDRESS					(0xffffffffbfc00000)
+
+#define configCHECK_FOR_STACK_OVERFLOW             3
 
 /* Hook functions */
 #define configUSE_IDLE_HOOK                         0

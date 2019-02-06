@@ -9,6 +9,8 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
+#include <string.h>
+
 /* Timer handling files */
 // #include "port_timer.h"
 
@@ -132,7 +134,6 @@ BaseType_t xPortStartScheduler( void )
 {
 extern void vPortStartFirstTask( void );
 extern void *pxCurrentTCB;
-	// wwrite(__func__);wwrite("\n");
 #if ( configCHECK_FOR_STACK_OVERFLOW > 2 )
 {
 	/* Fill the ISR stack to make it easy to asses how much is being used. */
@@ -144,13 +145,14 @@ extern void *pxCurrentTCB;
 	Its stack location is loaded into uxSavedTaskStackPointer. */
 	uxSavedTaskStackPointer = *( UBaseType_t * ) pxCurrentTCB;
 
-	mips_eic0_setmask(0x9);
+	mips_eic0_setmask(9);
 
 	// putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
 	// putsnds("sr=0x", mips_getsr(), 8, "\n");
     // putsnds("cr=0x", mips_getcr(), 8, "\n");
 
     mips32_bissr (SR_IE);
+
     mips_setcount(0);
     mips_setcompare(0x3000);
 
@@ -171,6 +173,10 @@ extern void *pxCurrentTCB;
 
 void vPortIncrementTick( void )
 {
+    // SendByte('~');
+    // if(*((unsigned char*)0xffffffffa0009e81) != 'A');
+        // SendByte('&');
+
 	if( xTaskIncrementTick() != pdFALSE )
 	{
 		/* Pend a context switch. */

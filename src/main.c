@@ -3,9 +3,7 @@
 #include "task.h"
 #include "queue.h"
 
-/* Priorities at which the tasks are created. */
-#define mainQUEUE_RECEIVE_TASK_PRIORITY		( tskIDLE_PRIORITY + 2 )
-#define	mainQUEUE_SEND_TASK_PRIORITY		( tskIDLE_PRIORITY + 1 )
+#include "iolib.h"
 
 /* The rate at which data is sent to the queue, specified in milliseconds. */
 #define mainQUEUE_SEND_FREQUENCY_MS			( 10 )
@@ -20,8 +18,8 @@ the queue empty. */
 /*
  * The tasks as described in the accompanying PDF application note.
  */
-static void prvQueueReceiveTask( void *pvParameters );
-static void prvQueueSendTask( void *pvParameters );
+static void CheckTask( void *pvParameters );
+static void FillTask( void *pvParameters );
 static void taskA( void* );
 static void taskB( void* );
 
@@ -37,40 +35,31 @@ the result of which being that the logic analyzer shows which task is
 running when. */
 unsigned long ulTaskNumber[ 3 ];
 
+uint32_t data[16];
+
 /*-----------------------------------------------------------*/
 int main(void)
 {
     OutString("######################################################\n");
-	OutString("Welcome to MIPS FreeRTOS 0.0.0\n");
+	OutString("Welcome to MIPS FreeRTOS 0.0.1\n");
 
-	/* Create the queue. */
-	xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( unsigned long ) );
-
-	if( xQueue != NULL )
-	{
-		/* Start the two tasks as described in the accompanying application
-		note. */
-		xTaskCreate( prvQueueReceiveTask, ( signed char * ) "Rx",
-			configMINIMAL_STACK_SIZE, NULL, mainQUEUE_RECEIVE_TASK_PRIORITY, NULL );
-		xTaskCreate( prvQueueSendTask, ( signed char * ) "TX",
-			configMINIMAL_STACK_SIZE, NULL, mainQUEUE_SEND_TASK_PRIORITY, NULL );
-
-		// xTaskCreate( taskA, ( signed char * ) "taskA", configMINIMAL_STACK_SIZE,
-			// NULL, tskIDLE_PRIORITY + 1, NULL );
-		// xTaskCreate( taskB, ( signed char * ) "taskB", configMINIMAL_STACK_SIZE,
-			// NULL, tskIDLE_PRIORITY + 1, NULL );
-
-		// asm("nop\n"
-			// "nop\n"
-			// "nop\n"
-            // "nop\n"
-		// );
+	// xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( unsigned long ) );
+    //
+	// if( xQueue != NULL )
+	// {
+		// xTaskCreate( CheckTask, ( signed char * ) "CheckTask",
+		// 	configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2 , NULL );
+		// xTaskCreate( FillTask, ( signed char * ) "FillTask",
+		// 	configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1 , NULL );
+        //
+		xTaskCreate( taskA, ( signed char * ) "taskA", configMINIMAL_STACK_SIZE,
+			NULL, tskIDLE_PRIORITY + 1, NULL );
+		xTaskCreate( taskB, ( signed char * ) "taskB", configMINIMAL_STACK_SIZE,
+			NULL, tskIDLE_PRIORITY + 1, NULL );
 
 		/* Start the tasks running. */
 		vTaskStartScheduler();
-	}
-
-    // Мы должны придти в эту точку.
+	// }
 
 	OutString("WARNING! This point in main must not be reached!\n");
 	/* If all is well we will never reach here as the scheduler will now be
@@ -81,93 +70,98 @@ int main(void)
 /*-----------------------------------------------------------*/
 void vApplicationIdleHook( void )
 {
-    SendByte('.');
+    for( ;; ){
+        // mips_getrand();
+        SendByte('.');
+        // SendByte('0' + mips_getrand() % 10);
+    }
+}
+
+// void vApplicationTickHook( void )
+// {
+//     for( ;; ){
+//         asm("nop");
+//     }
+// }
+
+uint64_t fib(int n)
+{
+    if(n == 0)return 0;
+    else return fib(n - 1) + fib(n - 2);
 }
 
 static void taskA( void *pvParameters )
 {
-	// for( ;; ){
-		// for(int i = 0;i < 10000;i++);
+    for(;;){
+        OutString("12345\n");
         vTaskDelete(NULL);
-	// }
+    }
 }
 
 static void taskB( void *pvParameters )
 {
-	// for( ;; ){
-// 		for(int i = 0;i < 10000;i++);
-		// OutString("XYZW\n");
+    for(;;){
+        OutString("ABCDEF\n");
         vTaskDelete(NULL);
-	// }
+    }
 }
 /*-----------------------------------------------------------*/
 
-static void prvQueueSendTask( void *pvParameters )
+static void FillTask( void *pvParameters )
 {
 portTickType xNextWakeTime;
-const unsigned long ulValueToSend = 100UL;
+const unsigned long ulValueToSend = 8;
 
-    OutString(__func__); OutString(" call...\n");
+    for(int i = 0; i < 16; i++)
+        data[i] = i + 5;
 
 	/* Initialise xNextWakeTime - this only needs to be done once. */
 	xNextWakeTime = xTaskGetTickCount();
 
-	for( ;; )
-	{
-		/* Place this task in the blocked state until it is time to run again.
-		The block time is specified in ticks, the constant used converts ticks
-		to ms.  While in the Blocked state this task will not consume any CPU
-		time. */
-		vTaskDelayUntil( &xNextWakeTime, mainQUEUE_SEND_FREQUENCY_MS );
+	vTaskDelayUntil( &xNextWakeTime, mainQUEUE_SEND_FREQUENCY_MS );
 
-		/* Send to the queue - causing the queue receive task to unblock and
-		print out a message.  0 is used as the block time so the sending
-		operation will not block - it shouldn't need to block as the queue
-		should always be empty at this point in the code. */
-		xQueueSend( xQueue, &ulValueToSend, 0 );
+	/* Send to the queue - causing the queue receive task to unblock and
+	print out a message.  0 is used as the block time so the sending
+	operation will not block - it shouldn't need to block as the queue
+	should always be empty at this point in the code. */
+	xQueueSend( xQueue, &ulValueToSend, 0 );
 
-        OutString(__func__); OutString(" message sent\n");
-		vTaskDelete(NULL);
-	}
+	vTaskDelete(NULL);
 }
 /*-----------------------------------------------------------*/
 
-static unsigned long ulRcv;
-
-static void prvQueueReceiveTask( void *pvParameters )
+static void CheckTask( void *pvParameters )
 {
 unsigned long ulReceivedValue;
-    OutString(__func__); OutString(" call\n");
 
-	for( ;; )
-	{
-		/* Wait until something arrives in the queue - this task will block
-		indefinitely provided INCLUDE_vTaskSuspend is set to 1 in
-		FreeRTOSConfig.h. */
-		xQueueReceive( xQueue, &ulReceivedValue, portMAX_DELAY );
+	/* Wait until something arrives in the queue - this task will block
+	indefinitely provided INCLUDE_vTaskSuspend is set to 1 in
+	FreeRTOSConfig.h. */
+	xQueueReceive( xQueue, &ulReceivedValue, portMAX_DELAY );
 
-        OutString(__func__); OutString(" message received\n");
-
-		/*  To get here something must have been received from the queue, but
-		is it the expected value?  If it is, print out a pass message, if no,
-		print out a fail message. */
-		if( ulReceivedValue == 100UL )
-		{
-			ulRcv++;
-			OutString("ok\n");
-			vTaskDelete(NULL);
-		}
-		else
-		{
-			OutString("no\n");
-			ulRcv = 0;
-		}
-	}
+    for(;;){
+	/*  To get here something must have been received from the queue, but
+	is it the expected value?  If it is, print out a pass message, if no,
+	print out a fail message. */
+    	if( ulReceivedValue == 8 )
+    	{
+            OutString("Test #1: ");
+            for(int i = 0;i < 16;i++)
+                if(data[i] != i + 5){
+                    OutString("FAILED\n");
+                    vTaskDelete(NULL);
+                }
+            // asm("pause");
+    		OutString("PASSED\n");
+            vTaskDelete(NULL);
+    	}
+    }
 }
 /*-----------------------------------------------------------*/
 void vAssertCalled( const char *pcFileName, unsigned long ulLine )
 {
-	OutString("Guru meditation in ");
+    asm("di");
+	OutString("\nGuru meditation in ");
 	OutString(pcFileName);
     OutString(": 0x"); OutReg32((reg_t)ulLine); SendByte('\n');
 	for (;;);

@@ -76,6 +76,8 @@ task.h is included from an application file. */
 #include "task.h"
 #include "queue.h"
 
+#include <string.h>
+
 #if ( configUSE_CO_ROUTINES == 1 )
 	#include "croutine.h"
 #endif
@@ -2946,15 +2948,3 @@ BaseType_t xReturn;
 	}
 
 #endif /* configUSE_QUEUE_SETS */
-
-
-
-
-
-
-
-
-
-
-
-

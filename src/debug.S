@@ -678,3 +678,187 @@ LEAF(OutGPR)
 	jr	ra
 END(OutGPR)
 /****************************************************/
+LEAF(OutGPRfromPSS)
+    push    ra
+    push    a0
+
+    WRITE	"	HI=0x"
+	mfhi	a0
+	jal		OutReg64
+
+	WRITE	" LO=0x"
+	mflo	a0
+	jal		OutReg64
+
+	WRITE	" EPC=0x"
+	dmfc0	a0, $14, 0
+	jal		OutReg64
+
+	jal		OutCRLF
+
+	WRITE	" GPR00:"
+
+	WRITE	" r0 "
+	rdpgpr	a0, $0
+	jal		OutReg64
+
+	WRITE	" at "
+	.set noat
+	rdpgpr	a0, $1
+	.set at
+	jal		OutReg64
+
+	WRITE	" v0 "
+	rdpgpr	a0, $2
+	jal		OutReg64
+
+	WRITE	" v1 "
+	rdpgpr	a0, $3
+	jal		OutReg64
+
+	jal		OutCRLF
+
+	WRITE	" GPR04:"
+
+	WRITE	" a0 "
+	rdpgpr	a0, $4
+	jal		OutReg64
+
+	WRITE	" a1 "
+	rdpgpr	a0, $5
+	jal		OutReg64
+
+	WRITE	" a2 "
+	rdpgpr	a0, $6
+	jal		OutReg64
+
+	WRITE	" a3 "
+	rdpgpr	a0, $7
+	jal		OutReg64
+
+	jal		OutCRLF
+
+	WRITE	" GPR08:"
+
+	WRITE	" t0 "
+	rdpgpr	a0, $8
+	jal		OutReg64
+
+	WRITE	" t1 "
+	rdpgpr	a0, $9
+	jal		OutReg64
+
+	WRITE	" t2 "
+	rdpgpr	a0, $10
+	jal		OutReg64
+
+	WRITE	" t3 "
+	rdpgpr	a0, $11
+	jal		OutReg64
+
+	jal		OutCRLF
+
+	WRITE	" GPR12:"
+
+	WRITE	" t4 "
+	rdpgpr	a0, $12
+	jal		OutReg64
+
+	WRITE	" t5 "
+	rdpgpr	a0, $13
+	jal		OutReg64
+
+	WRITE	" t6 "
+	rdpgpr	a0, $14
+	jal		OutReg64
+
+	WRITE	" t7 "
+	rdpgpr	a0, $15
+	jal		OutReg64
+
+	jal		OutCRLF
+
+	WRITE	" GPR16:"
+
+	WRITE	" s0 "
+	rdpgpr	a0, $16
+	jal		OutReg64
+
+	WRITE	" s1 "
+	rdpgpr	a0, $17
+	jal		OutReg64
+
+	WRITE	" s2 "
+	rdpgpr	a0, $18
+	jal		OutReg64
+
+	WRITE	" s3 "
+	rdpgpr	a0, $19
+	jal		OutReg64
+
+	jal		OutCRLF
+
+	WRITE	" GPR20:"
+
+	WRITE	" s4 "
+	rdpgpr	a0, $20
+	jal		OutReg64
+
+	WRITE	" s5 "
+	rdpgpr	a0, $21
+	jal		OutReg64
+
+	WRITE	" s6 "
+	rdpgpr	a0, $22
+	jal		OutReg64
+
+	WRITE	" s7 "
+	rdpgpr	a0, $23
+	jal		OutReg64
+
+	jal		OutCRLF
+
+	WRITE	" GPR24:"
+
+	WRITE	" t8 "
+	rdpgpr	a0, $24
+	jal		OutReg64
+
+	WRITE	" t9 "
+	rdpgpr	a0, $25
+	jal		OutReg64
+
+	WRITE	" k0 "
+	rdpgpr	a0, $26
+	jal		OutReg64
+
+	WRITE	" k1 "
+	rdpgpr	a0, $27
+	jal		OutReg64
+
+	jal		OutCRLF
+
+	WRITE	" GPR28:"
+
+	WRITE	" gp "
+	rdpgpr	a0, $28
+	jal		OutReg64
+
+	WRITE	" sp "
+	rdpgpr	a0, $29
+	jal		OutReg64
+
+	WRITE	" s8 "
+	rdpgpr	a0, $30
+	jal		OutReg64
+
+	WRITE	" ra "
+	rdpgpr	a0, $31
+	jal		OutReg64
+
+	jal		OutCRLF
+
+    pop     a0
+    pop     ra
+    jr      ra
+END(OutGPRfromPSS)

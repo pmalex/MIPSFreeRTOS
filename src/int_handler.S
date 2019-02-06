@@ -15,28 +15,67 @@ string\@: .asciiz "\str"
 	jal		OutString
 .endm
 
+LEAF(_mips_tlb_refill_isr)
+	di
+    ld		sp, xISRStackTop
+
+    WRITE   "\nTLB Refill\n"
+
+    jal     OutGPRfromPSS
+
+    jal     OutCP0Reg
+
+    dmfc0   a0, C0_EPC
+    addiu   a0, 4
+    dmtc0   a0, C0_EPC
+    ehb
+
+1:  b 1b
+
+    eret
+END(_mips_tlb_refill_isr)
+
+LEAF(_mips_xtlb_refill_isr)
+	ld		sp, xISRStackTop
+
+	WRITE   "\nXTLB Refill\n"
+
+	jal     OutGPRfromPSS
+
+	jal     OutCP0Reg
+
+	dmfc0   a0, C0_EPC
+	addiu   a0, 4
+	dmtc0   a0, C0_EPC
+	ehb
+
+	1:  b 1b
+
+	eret
+END(_mips_xtlb_refill_isr)
+
+LEAF(_mips_cache_error_isr)
+    ld		sp, xISRStackTop
+
+    WRITE   "\nCache Error: "
+
+	jal     OutGPRfromPSS
+
+    jal     OutCP0Reg
+
+1:	b		1b
+END(_mips_cache_error_isr)
+
 /* General exception vector */
 LEAF(_mips_general_exception_isr)
-	LA		sp, xISRStackTop
+	di
+	ld		sp, xISRStackTop
 
-	WRITE "General Exception occured\n"
+	WRITE "\nGeneral Exception occured\n"
 
-	WRITE	"sr=0x"
-	mfc0	a0, C0_STATUS
-	ehb
-	jal	OutReg32
+    jal     OutGPRfromPSS
 
-	WRITE	",cr=0x"
-	mfc0	a0, C0_CAUSE
-	ehb
-	jal	OutReg32
-
-	WRITE	",epc=0x"
-	mfc0	a0, C0_EPC
-	ehb
-	jal		OutReg32
-
-	WRITE	"\nInfinite loop...\n"
+    jal     OutCP0Reg
 
 1:	b		1b
 END(_mips_general_exception_isr)
@@ -50,7 +89,10 @@ LEAF(_mips_isr_001)
     mtc0    a0, C0_CAUSE
     ehb
 
+	di
+
 	ld		sp, xISRStackTop
+    // LA      sp, __stack
     LA		gp, _gp
 
 	portYIELD_SAVE_PSS
@@ -61,6 +103,13 @@ LEAF(_mips_isr_001)
 
     // Count = 0
     mtc0	zero, C0_COUNT
+    ehb
+
+    mfc0    a0, C0_EPC
+    ehb
+    addiu   a0, 4
+    mtc0    a0, C0_EPC
+    ehb
 
     // Cause_DC = 1
     mfc0    a0, C0_CAUSE
@@ -72,6 +121,27 @@ LEAF(_mips_isr_001)
 	eret
 END(_mips_isr_001)
 
+LEAF(_mips_isr_002)
+    ld		sp, xISRStackTop
+
+    rdpgpr a0, v1
+    jal OutReg32
+    jal OutCRLF
+
+    mfc0 a0, C0_EPC
+    ehb
+    jal OutReg32
+    jal OutCRLF
+
+    mfc0    a0, C0_EPC
+    ehb
+    addiu   a0, 4
+    mtc0    a0, C0_EPC
+    ehb
+
+    eret
+END(_mips_isr_002)
+
 .align 8
 /* Timer interrupt handler */
 LEAF(_mips_isr_004)
@@ -82,13 +152,25 @@ LEAF(_mips_isr_004)
     mtc0    a0, C0_CAUSE
     ehb
 
+	di
+
 	ld		sp, xISRStackTop
+    // LA      sp, __stack
+
     LA		gp, _gp
 
     jal		vPortIncrementTick
 
     // Count = 0
 	mtc0	zero, C0_COUNT
+    ehb
+
+    mfc0    a0, C0_EPC
+    ehb
+	// jal OutReg32
+    addiu   a0, 4
+    mtc0    a0, C0_EPC
+    ehb
 
     // Cause_DC = 1
     mfc0    a0, C0_CAUSE
@@ -103,13 +185,21 @@ END(_mips_isr_004)
 .align 8
 /* Undefined interrupt */
 LEAF(_mips_interrupt)
-	LA		sp, xISRStackTop
+	di
 
-	WRITE	"Undefined interrupt\n"
+	ld		sp, xISRStackTop
 
-	WRITE	"Infinite loop...\n"
+	WRITE	"\nUndefined interrupt, code: 0x"
+    move    a0, k1
+    jal     OutReg32
 
-1:	b		1b
+	jal     OutGPRfromPSS
+
+    jal     OutCP0Reg
+
+	WRITE	"\nSYSTEM FAILURE!\n"
+
+	1:	b 1b
 END(_mips_interrupt)
 
 .align 8
@@ -128,8 +218,8 @@ LEAF(vPortStartFirstTask)
 		REG_L	$\num, CTX_REG(\num) (k0)
 	.endr
 
-/* 	lw		k1, CTX_STATUS(k0) */
-/* 	mtc0	k1, C0_STATUS */
+ 	lw		k1, CTX_STATUS(k0)
+    mtc0	k1, C0_STATUS
 	REG_L	k1, CTX_EPC(k0)
 	PTR_MTC0 k1, C0_EPC
 
@@ -142,8 +232,8 @@ LEAF(vPortStartFirstTask)
 	/* Finally restore k0/$26.  */
  	REG_L	$26, CTX_REG(26)(k0)
 
-	LA		sp, uxSavedTaskStackPointer
-	REG_L	sp, (sp)
+	LA		k0, uxSavedTaskStackPointer
+	REG_L	sp, (k0)
 
 	ADDU	sp, sp, CTX_SIZE
 

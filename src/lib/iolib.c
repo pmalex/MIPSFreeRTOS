@@ -1,11 +1,14 @@
-#include <mips/cpu.h>
-#include <stdint.h>
+#include "iolib.h"
 
 #include "crit_task.h"
 
-#define UART_BASE			0xffffffffb8210400
+uint8_t mips_getrand(void)
+{
+    mips_tlbr();
+    return mips32_get_c0(C0_RANDOM);
+}
 
-extern void OutString(const char*);
+// #define UART_BASE			0xffffffffb8210400
 
 // void SendByte (const uint8_t x)
 // {
@@ -14,7 +17,12 @@ extern void OutString(const char*);
 // 	*((volatile uint8_t* const)(UART_BASE + 0x20)) = x;
 //     // portEXIT_CRITICAL();
 // }
-//
+
+inline void delay(uint32_t v)
+{
+    for(int i = 0;i < v; i++);
+}
+
 // void OutString(const char *str)
 // {
 //     while(*str)
@@ -55,20 +63,4 @@ extern void OutString(const char*);
 // void putsns (const char *pre, reg_t value, const char *post)
 // {
 // 	putsnds (pre, value, sizeof (reg_t) * 2, post);
-// }
-
-// void* memset(void* memptr, int val, size_t num)
-// {
-// 	while(num--)
-// 		*((uint8_t*)memptr + num) = (uint8_t)val;
-//
-// 	return memptr;
-// }
-//
-// void* memcpy(void * destptr, const void* srcptr, size_t num)
-// {
-// 	while(num--)
-// 		*((uint8_t*)destptr + num) = *((uint8_t*)srcptr + num);
-//
-// 	return destptr;
 // }

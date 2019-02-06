@@ -2,7 +2,7 @@ ENTRY(_start)
 OUTPUT_FORMAT("elf64-tradlittlemips")
 SEARCH_DIR(objs)
 __DYNAMIC  =  0;
-GROUP(-lc)
+GROUP(-lc -lgcc)
 STARTUP(minicrt.o)
 
 /*

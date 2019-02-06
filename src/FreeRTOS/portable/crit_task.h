@@ -14,8 +14,8 @@ extern "C"
 extern void vTaskEnterCritical( void );
 extern void vTaskExitCritical( void );
 #define portCRITICAL_NESTING_IN_TCB 1
-#define portENTER_CRITICAL()        vTaskEnterCritical()
-#define portEXIT_CRITICAL()         vTaskExitCritical()
+#define portENTER_CRITICAL()          vTaskEnterCritical()
+#define portEXIT_CRITICAL()          vTaskExitCritical()
 
 #ifndef configUSE_PORT_OPTIMISED_TASK_SELECTION
 	#define configUSE_PORT_OPTIMISED_TASK_SELECTION 1
