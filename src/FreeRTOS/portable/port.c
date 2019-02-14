@@ -148,7 +148,7 @@ extern void *pxCurrentTCB;
 	mips_eic0_setmask(9);
 
 	// putsnds("mask=0x", mips_eic0_getmask(), 8, "\n");
-	// putsnds("sr=0x", mips_getsr(), 8, "\n");
+	// OutReg32(mips_getsr());
     // putsnds("cr=0x", mips_getcr(), 8, "\n");
 
     mips32_bissr (SR_IE);
@@ -173,7 +173,7 @@ extern void *pxCurrentTCB;
 
 void vPortIncrementTick( void )
 {
-    // SendByte('~');
+    SendByte('~');
     // if(*((unsigned char*)0xffffffffa0009e81) != 'A');
         // SendByte('&');
 

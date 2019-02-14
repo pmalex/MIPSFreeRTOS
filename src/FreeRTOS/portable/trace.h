@@ -14,7 +14,7 @@ extern "C"
 #define TRACE_NUM(x,y) do{ TRACE_PROMPT(); TRACE_OUT_STRING(x); \
     SendByte(' '); OutReg32((reg_t)y);} while(0)
 
-#define traceTASK_INCREMENT_TICK(xTickCount)  SendByte('~');
+// #define traceTASK_INCREMENT_TICK(xTickCount)  SendByte('~');
 #define traceTASK_SWITCHED_OUT()              TRACE_STR("SWITCH_OUT", pxCurrentTCB -> pcTaskName)
 #define traceTASK_SWITCHED_IN()               TRACE_STR("SWITCH_IN", pxCurrentTCB -> pcTaskName)
 #define traceTASK_CREATE(pxNewTCB)            TRACE_STR("TASK_CREATE", pxNewTCB -> pcTaskName)

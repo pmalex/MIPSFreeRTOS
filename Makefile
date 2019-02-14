@@ -12,6 +12,8 @@ CCFLAGS = -EL -mabi=64 $(INCLUDE) -mclib=tiny -msoft-float -O0 -g
 LDSCRIPT = script.ld
 LDFLAGS = -T$(LDSCRIPT) -msoft-float -EL -mabi=64
 
+AWKSCRIPT = awk -f script.awk
+
 CSRC :=  \
 	main.c \
 	init_hook.c \
@@ -23,7 +25,7 @@ CSRC :=  \
 	timers.c \
 	event_groups.c \
 	croutine.c \
-	heap_4.c \
+	heap_2.c \
 	port.c
 
 ASMSRC := debug.S int_handler.S
@@ -32,7 +34,11 @@ OBJS := $(ASMSRC:.S=.o) $(CSRC:.c=.o)
 
 OBJDIR = objs
 SRCDIR = src
+ASMDIR = asm
 TOBJS := $(addprefix $(OBJDIR)/, $(OBJS))
+
+# Do not delete asm folder after compile
+.PRECIOUS:$(ASMDIR)/%.S
 
 all: $(OBJDIR)/minicrt.o $(APP).bin
 
@@ -42,26 +48,31 @@ $(APP).bin: $(APP).elf
 $(APP).elf: $(TOBJS)
 	@ $(CC) $(LDFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/drivers/%.c
+$(OBJDIR)/%.o: $(ASMDIR)/%.S
+	@ awk -f script.awk $^ > $(ASMDIR)/tmp.S
+	@ mv $(ASMDIR)/tmp.S $^
 	@ $(CC) -c $(CCFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/FreeRTOS/MemMang/%.c
-	@ $(CC) -c $(CCFLAGS) $^ -o $@
+$(ASMDIR)/%.S: $(SRCDIR)/drivers/%.c
+	@ $(CC) -S $(CCFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/FreeRTOS/portable/%.c
-	@ $(CC) -c $(CCFLAGS) $^ -o $@
+$(ASMDIR)/%.S: $(SRCDIR)/FreeRTOS/MemMang/%.c
+	@ $(CC) -S $(CCFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/FreeRTOS/%.c
-	@ $(CC) -c $(CCFLAGS) $^ -o $@
+$(ASMDIR)/%.S: $(SRCDIR)/FreeRTOS/portable/%.c
+	@ $(CC) -S $(CCFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.S
-	@ $(CC) -c $(CCFLAGS) $^ -o $@
+$(ASMDIR)/%.S: $(SRCDIR)/FreeRTOS/%.c
+	@ $(CC) -S $(CCFLAGS) $^ -o $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.c
-	@ $(CC) -c $(CCFLAGS) $^ -o $@
+$(ASMDIR)/%.S: $(SRCDIR)/%.S
+	@ $(CC) -S $(CCFLAGS) $^ > $@
 
-$(OBJDIR)/%.o: $(SRCDIR)/lib/%.c
-	@ $(CC) -c $(CCFLAGS) $^ -o $@
+$(ASMDIR)/%.S: $(SRCDIR)/%.c
+	@ $(CC) -S $(CCFLAGS) $^ -o $@
+
+$(ASMDIR)/%.S: $(SRCDIR)/lib/%.c
+	@ $(CC) -S $(CCFLAGS) $^ -o $@
 
 .PHONY: elfdump
 elfdump: $(APP).elf
@@ -81,4 +92,4 @@ firmware:
 
 .PHONY: clean
 clean:
-	@ rm -rf $(APP).bin $(APP).elf objs/*
+	@ rm -rf $(APP).bin $(APP).elf $(OBJDIR)/* $(ASMDIR)/*

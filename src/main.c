@@ -35,7 +35,7 @@ the result of which being that the logic analyzer shows which task is
 running when. */
 unsigned long ulTaskNumber[ 3 ];
 
-uint32_t data[16];
+uint8_t data[16];
 
 /*-----------------------------------------------------------*/
 int main(void)
@@ -52,9 +52,9 @@ int main(void)
 		// xTaskCreate( FillTask, ( signed char * ) "FillTask",
 		// 	configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1 , NULL );
         //
-		xTaskCreate( taskA, ( signed char * ) "taskA", configMINIMAL_STACK_SIZE,
+		xTaskCreate( taskA, ( signed char * ) "taskA", 100,
 			NULL, tskIDLE_PRIORITY + 1, NULL );
-		xTaskCreate( taskB, ( signed char * ) "taskB", configMINIMAL_STACK_SIZE,
+		xTaskCreate( taskB, ( signed char * ) "taskB", 100,
 			NULL, tskIDLE_PRIORITY + 1, NULL );
 
 		/* Start the tasks running. */

@@ -118,6 +118,9 @@ LEAF(_mips_isr_001)
     mtc0    a0, C0_CAUSE
     ehb
 
+	ei
+	ehb
+
 	eret
 END(_mips_isr_001)
 
@@ -178,6 +181,9 @@ LEAF(_mips_isr_004)
     or      a0, a0, a1
     mtc0    a0, C0_CAUSE
     ehb
+
+	ei
+	ehb
 
 	eret
 END(_mips_isr_004)
