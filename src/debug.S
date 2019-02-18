@@ -32,40 +32,40 @@ LEAF(debug_proc)
 1:	b	1b
 END(debug_proc)
 /****************************************************/
-LEAF(SendByte)
-    push    ra
-    push    t8
-    push    t9
-
-    li		t8, 0xb8210400
-1:  lbu     t9, 0x08(t8)		# читаем в t9 из S0STS
-    andi	t9, t9,0x08	       	# буфер и сдвигатель пусты?
-    beqz	t9, 1b				# если $t9==0, ждём
-    sb		a0, 0x20(t8)		# в S0TBUF отправляем $a0
-
-    pop     t9
-    pop     t8
-    pop     ra
-    jr  ra
-END(SendByte)
-
-LEAF(OutString)
-	push	ra
-	push	a0
-	push	t8
-
-	move	t8, a0
-1:	lb		a0, 0(t8)
-	beqz	a0, 2f
-	jal		SendByte
-	addiu	t8, t8, 1
-	b		1b
-
-2:	pop		t8
-	pop		a0
-	pop		ra
-	jr	ra
-END(OutString)
+// LEAF(SendByte)
+//     push    ra
+//     push    t8
+//     push    t9
+//
+//     li		t8, 0xb8210400
+// 1:  lbu     t9, 0x08(t8)		# читаем в t9 из S0STS
+//     andi	t9, t9,0x08	       	# буфер и сдвигатель пусты?
+//     beqz	t9, 1b				# если $t9==0, ждём
+//     sb		a0, 0x20(t8)		# в S0TBUF отправляем $a0
+//
+//     pop     t9
+//     pop     t8
+//     pop     ra
+//     jr  ra
+// END(SendByte)
+//
+// LEAF(OutString)
+// 	push	ra
+// 	push	a0
+// 	push	t8
+//
+// 	move	t8, a0
+// 1:	lb		a0, 0(t8)
+// 	beqz	a0, 2f
+// 	jal		SendByte
+// 	addiu	t8, t8, 1
+// 	b		1b
+//
+// 2:	pop		t8
+// 	pop		a0
+// 	pop		ra
+// 	jr	ra
+// END(OutString)
 
 LEAF(OutReg64)
 	.set push

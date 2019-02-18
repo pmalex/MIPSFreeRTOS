@@ -8,26 +8,26 @@ uint8_t mips_getrand(void)
     return mips32_get_c0(C0_RANDOM);
 }
 
-// #define UART_BASE			0xffffffffb8210400
+#define UART_BASE			0xffffffffb8210400
 
-// void SendByte (const uint8_t x)
-// {
-//     // portENTER_CRITICAL();
-// 	while(!(*((volatile uint8_t* const)(UART_BASE + 0x08)) & 0x08));
-// 	*((volatile uint8_t* const)(UART_BASE + 0x20)) = x;
-//     // portEXIT_CRITICAL();
-// }
+void SendByte (const uint8_t x)
+{
+    // portENTER_CRITICAL();
+	while(!(*((volatile uint8_t* const)(UART_BASE + 0x08)) & 0x08));
+	*((volatile uint8_t* const)(UART_BASE + 0x20)) = x;
+    // portEXIT_CRITICAL();
+}
 
 inline void delay(uint32_t v)
 {
     for(int i = 0;i < v; i++);
 }
 
-// void OutString(const char *str)
-// {
-//     while(*str)
-//         SendByte(*str++);
-// }
+void OutString(const char *str)
+{
+    while(*str)
+        SendByte(*str++);
+}
 
 // int write (int file, const char *ptr, int len)
 // {

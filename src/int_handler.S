@@ -89,7 +89,8 @@ LEAF(_mips_isr_001)
     mtc0    a0, C0_CAUSE
     ehb
 
-	di
+	// di
+	// ehb
 
 	ld		sp, xISRStackTop
     // LA      sp, __stack
@@ -118,8 +119,8 @@ LEAF(_mips_isr_001)
     mtc0    a0, C0_CAUSE
     ehb
 
-	ei
-	ehb
+	// ei
+	// ehb
 
 	eret
 END(_mips_isr_001)
@@ -155,7 +156,8 @@ LEAF(_mips_isr_004)
     mtc0    a0, C0_CAUSE
     ehb
 
-	di
+	// di
+	// ehb
 
 	ld		sp, xISRStackTop
     // LA      sp, __stack
@@ -170,9 +172,8 @@ LEAF(_mips_isr_004)
 
     mfc0    a0, C0_EPC
     ehb
-	// jal OutReg32
     addiu   a0, 4
-    mtc0    a0, C0_EPC
+	mtc0    a0, C0_EPC
     ehb
 
     // Cause_DC = 1
@@ -182,8 +183,8 @@ LEAF(_mips_isr_004)
     mtc0    a0, C0_CAUSE
     ehb
 
-	ei
-	ehb
+	// ei
+	// ehb
 
 	eret
 END(_mips_isr_004)

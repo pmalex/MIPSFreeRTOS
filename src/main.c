@@ -41,7 +41,7 @@ uint8_t data[16];
 int main(void)
 {
     OutString("######################################################\n");
-	OutString("Welcome to MIPS FreeRTOS 0.0.1\n");
+	OutString("Welcome to MIPS FreeRTOS 0.0.2\n");
 
 	// xQueue = xQueueCreate( mainQUEUE_LENGTH, sizeof( unsigned long ) );
     //
@@ -51,7 +51,7 @@ int main(void)
 		// 	configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 2 , NULL );
 		// xTaskCreate( FillTask, ( signed char * ) "FillTask",
 		// 	configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY + 1 , NULL );
-        //
+
 		xTaskCreate( taskA, ( signed char * ) "taskA", 100,
 			NULL, tskIDLE_PRIORITY + 1, NULL );
 		xTaskCreate( taskB, ( signed char * ) "taskB", 100,
@@ -84,11 +84,11 @@ void vApplicationIdleHook( void )
 //     }
 // }
 
-uint64_t fib(int n)
-{
-    if(n == 0)return 0;
-    else return fib(n - 1) + fib(n - 2);
-}
+// uint64_t fib(int n)
+// {
+//     if(n == 0)return 0;
+//     else return fib(n - 1) + fib(n - 2);
+// }
 
 static void taskA( void *pvParameters )
 {

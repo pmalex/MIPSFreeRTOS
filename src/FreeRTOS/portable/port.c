@@ -176,6 +176,7 @@ void vPortIncrementTick( void )
     SendByte('~');
     // if(*((unsigned char*)0xffffffffa0009e81) != 'A');
         // SendByte('&');
+	// register uint64_t sp asm("sp");
 
 	if( xTaskIncrementTick() != pdFALSE )
 	{

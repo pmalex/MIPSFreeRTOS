@@ -60,7 +60,7 @@
 #define INCLUDE_vTaskDelete							1
 #define INCLUDE_vTaskSuspend						1
 
-// #define ENABLE_TRACE
+#define ENABLE_TRACE
 
 #if defined(ENABLE_TRACE)
 #include "trace.h"
